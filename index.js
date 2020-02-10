@@ -34,17 +34,24 @@ async function init() {
             const queryUrl = `https://api.github.com/users/${username}`;
 
             axios.get(queryUrl).then(res => {
-                var filename = res.data.toLowerCase().split(' ').join('') + ".json";
+                var name = res.data.name;
+                var avatarUrl= res.data.avatar_url;
+                var location = res.data.location;
+                var company = res.data.company;
+                var githubUrl= res.data.html_url;
+                var public_repos = res.data.public_repos;
+                var followers = res.data.followers;
+                var blog = res.data.blog;
+                var following = res.data.following;
+                var name = res.data.name;
 
-                fs.writeFile(filename, JSON.stringify(data, null, '\t'), function(err) {
-              
-                  if (err) {
-                    return console.log(err);
-                  }
-              
-                  console.log("Success!");
-                })
-              
+                // console.log(name)
+                // console.log(res)
+
+
+                answers.push(name,avatarUrl,location,company,githubUrl,public_repos,followers,blog,following)
+                console.log(answers)
+
             })
 
 
