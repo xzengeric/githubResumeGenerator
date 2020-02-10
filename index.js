@@ -4,7 +4,7 @@ const util = require("util");
 const axios = require("axios");
 
 
-const answers= [];
+const answersarry = [];
 
 const writeFileAsync = util.promisify(fs.writeFile);
 
@@ -49,9 +49,16 @@ async function init() {
                 // console.log(res)
 
 
-                answers.push(name,avatarUrl,location,company,githubUrl,public_repos,followers,blog,following)
-                console.log(answers)
+                answersarry.push({'name' : name, 'avatarUrl':avatarUrl, 'location':location,'company':company,
+                'githubUrl':githubUrl,'public_repos':public_repos,
+                'followers':followers,
+                'blog':blog,
+                'following':following,
+                'color':color})
+                // console.log(answersarry)
 
+                var html = generateHTML(answersarry);
+                return html;
             })
 
 
@@ -96,7 +103,9 @@ const colors = {
   };
   
   function generateHTML(data) {
-     
+     console.log(data);
+     var c = data[0].color;
+     console.log(`${colors[c].wrapperBackground}`);
     return `<!DOCTYPE html>
   <html lang="en">
      <head>
@@ -123,7 +132,7 @@ const colors = {
            height: 100%;
            }
            .wrapper {
-           background-color: ${colors[data.color].wrapperBackground};
+           background-color: ${colors[c].wrapperBackground};
            padding-top: 100px;
            }
            body {
@@ -165,8 +174,8 @@ const colors = {
            display: flex;
            justify-content: center;
            flex-wrap: wrap;
-           background-color: ${colors[data.color].headerBackground};
-           color: ${colors[data.color].headerColor};
+           background-color: ${colors[c].headerBackground};
+           color: ${colors[c].headerColor};
            padding: 10px;
            width: 95%;
            border-radius: 6px;
@@ -177,7 +186,7 @@ const colors = {
            border-radius: 50%;
            object-fit: cover;
            margin-top: -75px;
-           border: 6px solid ${colors[data.color].photoBorderColor};
+           border: 6px solid ${colors[c].photoBorderColor};
            box-shadow: rgba(0, 0, 0, 0.3) 4px 1px 20px 4px;
            }
            .photo-header h1, .photo-header h2 {
@@ -220,8 +229,8 @@ const colors = {
            .card {
              padding: 20px;
              border-radius: 6px;
-             background-color: ${colors[data.color].headerBackground};
-             color: ${colors[data.color].headerColor};
+             background-color: ${colors[c].headerBackground};
+             color: ${colors[c].headerColor};
              margin: 20px;
            }
            
