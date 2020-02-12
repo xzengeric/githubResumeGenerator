@@ -1,5 +1,6 @@
 const inquirer = require("inquirer");
-const fs = require("fs");
+const fs = require("fs"),
+  convertFactory = require('electron-html-to');
 const util = require("util");
 const axios = require("axios");
 
@@ -9,104 +10,122 @@ const answersarry = [];
 const writeFileAsync = util.promisify(fs.writeFile);
 
 function promptUser() {
-    return inquirer.prompt([
-        {
-            type: "input",
-            name: "username",
-            message: "What is your name?"
-        },
-        {
-            type: "input",
-            name: "color",
-            message: "What is your favorite color?"
-        },
-    ]);
+  return inquirer.prompt([
+    {
+      type: "input",
+      name: "username",
+      message: "What is your name?"
+    },
+    {
+      type: "input",
+      name: "color",
+      message: "What is your favorite color?"
+    },
+  ]);
 }
 
 
 async function init() {
-    console.log("hi")
-    try {
+  console.log("hi")
+  try {
 
-        const answers = promptUser();
+    const answers = promptUser();
 
-        answers.then(function ({ username, color }) {
-            const queryUrl = `https://api.github.com/users/${username}`;
+    answers.then(function ({ username, color }) {
+      const queryUrl = `https://api.github.com/users/${username}`;
 
-            axios.get(queryUrl).then(res => {
-                var name = res.data.name;
-                var avatarUrl= res.data.avatar_url;
-                var location = res.data.location;
-                var company = res.data.company;
-                var githubUrl= res.data.html_url;
-                var public_repos = res.data.public_repos;
-                var followers = res.data.followers;
-                var blog = res.data.blog;
-                var following = res.data.following;
-                var name = res.data.name;
+      axios.get(queryUrl).then(res => {
+        var name = res.data.name;
+        var avatarUrl = res.data.avatar_url;
+        var location = res.data.location;
+        var company = res.data.company;
+        var githubUrl = res.data.html_url;
+        var public_repos = res.data.public_repos;
+        var followers = res.data.followers;
+        var blog = res.data.blog;
+        var following = res.data.following;
+        var name = res.data.name;
 
-                // console.log(name)
-                // console.log(res)
-
-
-                answersarry.push({'name' : name, 'avatarUrl':avatarUrl, 'location':location,'company':company,
-                'githubUrl':githubUrl,'public_repos':public_repos,
-                'followers':followers,
-                'blog':blog,
-                'following':following,
-                'color':color})
-                // console.log(answersarry)
-
-                var html = generateHTML(answersarry);
-                return html;
-            })
+        // console.log(name)
+        // console.log(res)
 
 
-            console.log("---------------------------------------------------------------------------------End"); 
-          
+        answersarry.push({
+          'name': name, 'avatarUrl': avatarUrl, 'location': location, 'company': company,
+          'githubUrl': githubUrl, 'public_repos': public_repos,
+          'followers': followers,
+          'blog': blog,
+          'following': following,
+          'color': color
+        })
+        // console.log(answersarry)
+
+        var html = generateHTML(answersarry);
+        var conversion = convertFactory({
+          converterPath: convertFactory.converters.PDF
         });
 
-    }
-    catch (err) {
-        console.log(err);
-    }
+        conversion({ html }, function (err, result) {
+          if (err) {
+            return console.error(err);
+          }
+
+          console.log(result.numberOfPages);
+          console.log(result.logs);
+          result.stream.pipe(fs.createWriteStream('./anywhere.pdf'));
+          conversion.kill(); // necessary if you use the electron-server strategy, see bellow for details
+        });
+      })
+
+
+      console.log("---------------------------------------------------------------------------------End");
+
+    });
+
+  }
+  catch (err) {
+    console.log(err);
+  }
 
 }
 
 
 
 const colors = {
-    green: {
-      wrapperBackground: "#E6E1C3",
-      headerBackground: "#C1C72C",
-      headerColor: "black",
-      photoBorderColor: "#black"
-    },
-    blue: {
-      wrapperBackground: "#5F64D3",
-      headerBackground: "#26175A",
-      headerColor: "white",
-      photoBorderColor: "#73448C"
-    },
-    pink: {
-      wrapperBackground: "#879CDF",
-      headerBackground: "#FF8374",
-      headerColor: "white",
-      photoBorderColor: "#FEE24C"
-    },
-    red: {
-      wrapperBackground: "#DE9967",
-      headerBackground: "#870603",
-      headerColor: "white",
-      photoBorderColor: "white"
-    }
-  };
-  
-  function generateHTML(data) {
-     console.log(data);
-     var c = data[0].color;
-     console.log(`${colors[c].wrapperBackground}`);
-    return `<!DOCTYPE html>
+  green: {
+    wrapperBackground: "#E6E1C3",
+    headerBackground: "#C1C72C",
+    headerColor: "black",
+    photoBorderColor: "#black"
+  },
+  blue: {
+    wrapperBackground: "#5F64D3",
+    headerBackground: "#26175A",
+    headerColor: "white",
+    photoBorderColor: "#73448C"
+  },
+  pink: {
+    wrapperBackground: "#879CDF",
+    headerBackground: "#FF8374",
+    headerColor: "white",
+    photoBorderColor: "#FEE24C"
+  },
+  red: {
+    wrapperBackground: "#DE9967",
+    headerBackground: "#870603",
+    headerColor: "white",
+    photoBorderColor: "white"
+  }
+};
+
+function generateHTML(data) {
+  console.log(data);
+  var data= data[0];
+
+  console.log(data.color);
+  console.log(`${colors[data.color].wrapperBackground}`);
+  console.log(`${data.name}`);
+  return `<!DOCTYPE html>
   <html lang="en">
      <head>
         <meta charset="UTF-8" />
@@ -132,7 +151,7 @@ const colors = {
            height: 100%;
            }
            .wrapper {
-           background-color: ${colors[c].wrapperBackground};
+           background-color: ${colors[data.color].wrapperBackground};
            padding-top: 100px;
            }
            body {
@@ -174,8 +193,8 @@ const colors = {
            display: flex;
            justify-content: center;
            flex-wrap: wrap;
-           background-color: ${colors[c].headerBackground};
-           color: ${colors[c].headerColor};
+           background-color: ${colors[data.color].headerBackground};
+           color: ${colors[data.color].headerColor};
            padding: 10px;
            width: 95%;
            border-radius: 6px;
@@ -186,7 +205,7 @@ const colors = {
            border-radius: 50%;
            object-fit: cover;
            margin-top: -75px;
-           border: 6px solid ${colors[c].photoBorderColor};
+           border: 6px solid ${colors[data.color].photoBorderColor};
            box-shadow: rgba(0, 0, 0, 0.3) 4px 1px 20px 4px;
            }
            .photo-header h1, .photo-header h2 {
@@ -217,7 +236,7 @@ const colors = {
            padding-left: 100px;
            padding-right: 100px;
            }
-  
+
            .row {
              display: flex;
              flex-wrap: wrap;
@@ -225,33 +244,41 @@ const colors = {
              margin-top: 20px;
              margin-bottom: 20px;
            }
-  
+
            .card {
              padding: 20px;
              border-radius: 6px;
-             background-color: ${colors[c].headerBackground};
-             color: ${colors[c].headerColor};
+             background-color: ${colors[data.color].headerBackground};
+             color: ${colors[data.color].headerColor};
              margin: 20px;
            }
-           
+
            .col {
            flex: 1;
            text-align: center;
            }
-  
+
            a, a:hover {
            text-decoration: none;
            color: inherit;
            font-weight: bold;
            }
-  
+
            @media print { 
             body { 
               zoom: .75; 
             } 
            }
-        </style>`
-          }
+
+        </style>
+        <body>
+        <h1> ${data.name} </h1>
+        </body>
+        
+        
+        
+        `
+}
 
 
 init();

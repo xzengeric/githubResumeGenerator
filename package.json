@@ -1,0 +1,29 @@
+{
+  "name": "githubResumeGenerator",
+  "version": "1.0.0",
+  "description": "Command-line application that dynamically generates a PDF profile from a GitHub username.",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "electron": "5.0.3",
+    "electron-html-to": "^2.6.0",
+    "fs": "^0.0.1-security",
+    "inquirer": "^7.0.4",
+    "util": "^0.12.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xzengeric/githubResumeGenerator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xzengeric/githubResumeGenerator/issues"
+  },
+  "homepage": "https://github.com/xzengeric/githubResumeGenerator#readme"
+}

@@ -26,6 +26,7 @@ const colors = {
 };
 
 function generateHTML(data) {
+  console.log(data, "i'm in the generateHTML file")
   return `<!DOCTYPE html>
 <html lang="en">
    <head>
@@ -171,4 +172,4 @@ function generateHTML(data) {
           } 
          }
       </style>`
-        }
+}
