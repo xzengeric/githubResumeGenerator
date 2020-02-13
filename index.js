@@ -17,7 +17,7 @@ function promptUser() {
     {
       type: "input",
       name: "username",
-      message: "What is your github username?"
+      message: "What is your github username? (or try username: ceckenrode for a demo. ). Enter here: "
     },
     {
       type: "list",
